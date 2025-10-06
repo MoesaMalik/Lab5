@@ -16,9 +16,8 @@ public class Lab3Application {
     public CommandLineRunner demo(AddressBookRepository addressBookRepo) {
         return (args) -> {
 
-            BuddyInfo b1 = new BuddyInfo("Moesa", "123-4567");
-            BuddyInfo b2 = new BuddyInfo("Malik", "911");
-
+            BuddyInfo b1 = new BuddyInfo("Moesa", "123-4567", "moesa@example.com");
+            BuddyInfo b2 = new BuddyInfo("Malik", "911", "malik@example.com");
 
             AddressBook ab = new AddressBook();
             ab.addBuddy(b1);
@@ -27,9 +26,7 @@ public class Lab3Application {
             //save it to db
             addressBookRepo.save(ab);
 
-
             System.out.println("AddressBooks in DB:");
-
             addressBookRepo.findAll().forEach(System.out::println);
         };
     }

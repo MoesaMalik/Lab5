@@ -1,4 +1,5 @@
 package org.example;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,11 +49,10 @@ public class AddressBook {
         return sb.toString();
     }
 
-
     public static void main(String[] args) {
         AddressBook ab = new AddressBook();
-        ab.addBuddy(new BuddyInfo("Moosey", "613-111-2222"));
-        ab.addBuddy(new BuddyInfo("Pops", "613-333-4444"));
+        ab.addBuddy(new BuddyInfo("Moosey", "613-111-2222", "moosey@example.com"));
+        ab.addBuddy(new BuddyInfo("Pops", "613-333-4444", "pops@example.com"));
         System.out.println(ab);
     }
 }

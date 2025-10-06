@@ -17,9 +17,9 @@ public class AddressBookPersistenceTest {
 
     @Test
     public void testSaveAndLoadAddressBook() {
-        // Create buddies
-        BuddyInfo b1 = new BuddyInfo("Moesa", "123-4567");
-        BuddyInfo b2 = new BuddyInfo("Malik", "987-6543");
+
+        BuddyInfo b1 = new BuddyInfo("Moesa", "123-4567", "moesa@example.com");
+        BuddyInfo b2 = new BuddyInfo("Malik", "987-6543", "malik@example.com");
 
         // Create address book and add buddies
         AddressBook ab = new AddressBook();
@@ -41,12 +41,17 @@ public class AddressBookPersistenceTest {
         assertThat(fetched.getBuddies())
                 .extracting(BuddyInfo::getName)
                 .containsExactlyInAnyOrder("Moesa", "Malik");
+
+        //New check for emails
+        assertThat(fetched.getBuddies())
+                .extracting(BuddyInfo::getEmailAddress)
+                .containsExactlyInAnyOrder("moesa@example.com", "malik@example.com");
     }
 
     @Test
     public void testFindAllAddressBooks() {
         AddressBook ab = new AddressBook();
-        ab.addBuddy(new BuddyInfo("Moesa", "555-5555"));
+        ab.addBuddy(new BuddyInfo("Moesa", "555-5555", "moesa@example.com"));
         addressBookRepository.save(ab);
 
         List<AddressBook> allBooks = (List<AddressBook>) addressBookRepository.findAll();

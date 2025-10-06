@@ -27,9 +27,9 @@ public class AddressBookIntegrationTest {
 
     @Test
     public void addressBookPageShouldContainHeader() {
-        // Arrange: create a test AddressBook with one buddy
+        // Arrange: create a test AddressBook with one buddy (now includes email)
         AddressBook ab = new AddressBook();
-        ab.addBuddy(new BuddyInfo("Test Buddy", "123-4567"));
+        ab.addBuddy(new BuddyInfo("Test Buddy", "123-4567", "testbuddy@example.com"));
         ab = addressBookRepository.save(ab);
 
         // Act
@@ -41,5 +41,6 @@ public class AddressBookIntegrationTest {
         assertThat(response.getBody()).contains("Address Book");
         assertThat(response.getBody()).contains("Buddies");
         assertThat(response.getBody()).contains("Test Buddy");
+        assertThat(response.getBody()).contains("testbuddy@example.com"); // ✅ new check
     }
 }

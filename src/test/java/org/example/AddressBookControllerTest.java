@@ -22,7 +22,8 @@ class AddressBookControllerTest {
     void shouldCreateAddressBook() throws Exception {
         this.mockMvc.perform(post("/addressbook")
                         .param("name", "Test Buddy")
-                        .param("phone", "123-4567"))
+                        .param("phone", "123-4567")
+                        .param("emailAddress", "testbuddy@example.com"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())   // JSON response contains an id
                 .andExpect(jsonPath("$.buddies.length()", is(0))); // empty buddies initially

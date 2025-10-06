@@ -13,23 +13,23 @@ public class BuddyInfo {
     private Integer id;
     private String name;
     private String phoneNumber;
+    private String emailAddress;
 
-
-
-    public BuddyInfo(String name, String phoneNumber) {
-        this.name = name;
-        this.phoneNumber = phoneNumber;
+    public BuddyInfo() {
     }
 
-
-    public BuddyInfo() { }
-
-    public String getName() {
-        return name;
+    public BuddyInfo(String name, String phoneNumber, String emailAddress) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.emailAddress = emailAddress;
     }
 
     public Integer getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setName(String name) {
@@ -44,9 +44,17 @@ public class BuddyInfo {
         this.phoneNumber = phoneNumber;
     }
 
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
     @Override
     public String toString() {
-        return name + " (" + phoneNumber + ")";
+        return name + " (" + phoneNumber + ", " + emailAddress + ")";
     }
 
     @Override
@@ -55,11 +63,12 @@ public class BuddyInfo {
         if (!(o instanceof BuddyInfo)) return false;
         BuddyInfo that = (BuddyInfo) o;
         return Objects.equals(name, that.name) &&
-                Objects.equals(phoneNumber, that.phoneNumber);
+                Objects.equals(phoneNumber, that.phoneNumber) &&
+                Objects.equals(emailAddress, that.emailAddress);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, phoneNumber);
+        return Objects.hash(name, phoneNumber, emailAddress);
     }
 }
