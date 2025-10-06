@@ -12,6 +12,16 @@ public class ViewController {
     @Autowired
     private AddressBookRepository addressBookRepo;
 
+    @GetMapping("/")
+    public String redirectToDefault() {
+        var books = addressBookRepo.findAll();
+        if (books.iterator().hasNext()) {
+            var first = books.iterator().next();
+            return "redirect:/addressbook/2/view";
+        }
+        return "redirect:/error";
+    }
+
     @GetMapping("/addressbook/{id}/view")
     public String viewAddressBook(@PathVariable Integer id, Model model) {
         AddressBook ab = addressBookRepo.findById(id).orElseThrow();

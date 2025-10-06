@@ -41,6 +41,6 @@ public class AddressBookIntegrationTest {
         assertThat(response.getBody()).contains("Address Book");
         assertThat(response.getBody()).contains("Buddies");
         assertThat(response.getBody()).contains("Test Buddy");
-        assertThat(response.getBody()).contains("testbuddy@example.com"); // ✅ new check
+        assertThat(response.getBody()).contains("testbuddy@example.com");
     }
 }
