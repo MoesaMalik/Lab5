@@ -14,12 +14,8 @@ public class ViewController {
 
     @GetMapping("/")
     public String redirectToDefault() {
-        var books = addressBookRepo.findAll();
-        if (books.iterator().hasNext()) {
-            var first = books.iterator().next();
-            return "redirect:/addressbook/2/view";
-        }
-        return "redirect:/error";
+        return "redirect:/addressbook/2/view";
+
     }
 
     @GetMapping("/addressbook/{id}/view")
