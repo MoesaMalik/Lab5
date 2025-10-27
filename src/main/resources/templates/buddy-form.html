@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Buddy</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #333; }
+        form {
+            background: #f4f4f4;
+            padding: 20px;
+            border-radius: 5px;
+            max-width: 400px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        input[type="submit"], input[type="reset"] {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 15px;
+        }
+        input[type="submit"]:hover { background: #0056b3; }
+        input[type="reset"] { background: #6c757d; }
+        input[type="reset"]:hover { background: #5a6268; }
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+<h1>Add Buddy to Address Book #<span th:text="${addressBook.id}"></span></h1>
+
+<form action="#" th:action="@{/addressbook/{id}/buddy/add(id=${addressBook.id})}"
+      th:object="${buddy}" method="post">
+
+    <label for="name">Name:</label>
+    <input type="text" id="name" th:field="*{name}" required />
+
+    <label for="phoneNumber">Phone Number:</label>
+    <input type="text" id="phoneNumber" th:field="*{phoneNumber}" required />
+
+    <label for="emailAddress">Email Address:</label>
+    <input type="text" id="emailAddress" th:field="*{emailAddress}" required />
+
+    <p>
+        <input type="submit" value="Add Buddy" />
+        <input type="reset" value="Reset" />
+    </p>
+</form>
+
+<a th:href="@{/addressbook/{id}/view(id=${addressBook.id})}" class="back-link">
+    ← Back to Address Book
+</a>
+</body>
+</html>

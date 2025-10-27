@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Address Books</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #333; }
+        .book-list { list-style: none; padding: 0; }
+        .book-item {
+            background: #f4f4f4;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .button:hover { background: #0056b3; }
+        .create-btn { background: #28a745; }
+        .create-btn:hover { background: #218838; }
+    </style>
+</head>
+<body>
+<h1>Address Books</h1>
+
+<a href="/addressbook/new" class="button create-btn">Create New Address Book</a>
+
+<ul class="book-list">
+    <li th:each="book : ${addressBooks}" class="book-item">
+        <strong>Address Book #<span th:text="${book.id}"></span></strong>
+        <br>
+        Buddies: <span th:text="${book.size()}"></span>
+        <br>
+        <a th:href="@{/addressbook/{id}/view(id=${book.id})}" class="button">View Details</a>
+    </li>
+</ul>
+
+<p th:if="${#lists.isEmpty(addressBooks)}">
+    No address books yet. <a href="/addressbook/new">Create one!</a>
+</p>
+</body>
+</html>

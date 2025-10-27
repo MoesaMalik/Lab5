@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Address Book</title>
+    <title>Address Book Details</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
         h1 { color: #333; }
@@ -41,31 +41,28 @@
     </style>
 </head>
 <body>
-<h1>Address Book<span th:if="${addressBook != null}"> #<span th:text="${addressBook.id}"></span></span></h1>
+<h1>Address Book #<span th:text="${addressBook.id}"></span></h1>
 
-<!-- Navigation buttons (only show if addressBook exists) -->
-<div th:if="${addressBook != null}">
-    <a th:href="@{/addressbook/{id}/buddy/new(id=${addressBook.id})}" class="button add-btn">Add New Buddy</a>
-    <a href="/addressbooks" class="button">← Back to All Address Books</a>
-</div>
+<a th:href="@{/addressbook/{id}/buddy/new(id=${addressBook.id})}" class="button add-btn">Add New Buddy</a>
+<a href="/addressbooks" class="button">← Back to All Address Books</a>
 
-<h2>Buddies<span th:if="${buddies != null}"> (<span th:text="${#lists.size(buddies)}"></span>)</span></h2>
+<h2>Buddies (<span th:text="${#lists.size(buddies)}"></span>)</h2>
 
-<table th:if="${buddies != null and not #lists.isEmpty(buddies)}">
+<table th:if="${not #lists.isEmpty(buddies)}">
     <thead>
     <tr>
         <th>Name</th>
         <th>Phone Number</th>
         <th>Email Address</th>
-        <th th:if="${addressBook != null}">Action</th>
+        <th>Action</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="buddy : ${buddies}">
-        <td><span th:text="${buddy.name}">Name</span></td>
-        <td><span th:text="${buddy.phoneNumber}">Phone</span></td>
-        <td><span th:text="${buddy.emailAddress}">Email</span></td>
-        <td th:if="${addressBook != null}">
+        <td th:text="${buddy.name}"></td>
+        <td th:text="${buddy.phoneNumber}"></td>
+        <td th:text="${buddy.emailAddress}"></td>
+        <td>
             <form th:action="@{/addressbook/{id}/buddy/{buddyId}/remove(id=${addressBook.id},buddyId=${buddy.id})}"
                   method="post" style="display: inline;">
                 <input type="submit" value="Remove" class="button delete-btn"
@@ -76,14 +73,8 @@
     </tbody>
 </table>
 
-<p th:if="${buddies != null and #lists.isEmpty(buddies)}">
-    No buddies in this address book yet.
-    <a th:if="${addressBook != null}" th:href="@{/addressbook/{id}/buddy/new(id=${addressBook.id})}">Add one!</a>
+<p th:if="${#lists.isEmpty(buddies)}">
+    No buddies in this address book yet. <a th:href="@{/addressbook/{id}/buddy/new(id=${addressBook.id})}">Add one!</a>
 </p>
-
-<!-- Fallback if no buddies variable -->
-<ul th:if="${buddies == null}">
-    <li>No buddy data available.</li>
-</ul>
 </body>
 </html>

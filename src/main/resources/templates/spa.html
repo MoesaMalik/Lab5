@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Address Book SPA</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            max-width: 1200px;
+        }
+        h1, h2 { color: #333; }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        .panel {
+            background: #f4f4f4;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .book-list, .buddy-list {
+            list-style: none;
+            padding: 0;
+        }
+        .book-item, .buddy-item {
+            background: white;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 3px;
+            border-left: 4px solid #007bff;
+        }
+        .buddy-item { border-left-color: #28a745; }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px 5px 5px 0;
+        }
+        button:hover { background: #0056b3; }
+        .create-btn { background: #28a745; }
+        .create-btn:hover { background: #218838; }
+        .delete-btn { background: #dc3545; }
+        .delete-btn:hover { background: #c82333; }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .form-section {
+            background: white;
+            padding: 15px;
+            border-radius: 3px;
+            margin-top: 20px;
+        }
+        .hidden { display: none; }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+<h1>Address Book Manager (SPA)</h1>
+
+<div class="container">
+    <!-- Left Panel: Address Books -->
+    <div class="panel">
+        <h2>Address Books</h2>
+        <button id="create-addressbook-btn" class="create-btn">Create New Address Book</button>
+        <ul id="addressbook-list" class="book-list"></ul>
+    </div>
+
+    <!-- Right Panel: Buddies -->
+    <div class="panel">
+        <div id="no-selection">
+            <p>Select an address book to view its buddies.</p>
+        </div>
+
+        <div id="buddy-section" class="hidden">
+            <h2>Buddies in Address Book #<span id="current-book-id"></span></h2>
+
+            <button id="add-buddy-btn" class="create-btn">Add New Buddy</button>
+
+            <!-- Add Buddy Form -->
+            <div id="add-buddy-form" class="form-section hidden">
+                <h3>Add New Buddy</h3>
+                <label>Name:</label>
+                <input type="text" id="buddy-name" required />
+
+                <label>Phone Number:</label>
+                <input type="text" id="buddy-phone" required />
+
+                <label>Email Address:</label>
+                <input type="text" id="buddy-email" required />
+
+                <button id="submit-buddy-btn">Add Buddy</button>
+                <button id="cancel-buddy-btn">Cancel</button>
+            </div>
+
+            <div id="message-area"></div>
+
+            <ul id="buddy-list" class="buddy-list"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentAddressBookId = null;
+
+    $(document).ready(function() {
+        loadAddressBooks();
+
+        // Create new address book
+        $('#create-addressbook-btn').click(function() {
+            $.ajax({
+                url: '/addressbook',
+                method: 'POST',
+                contentType: 'application/json'
+            }).done(function(data) {
+                showMessage('Address book created successfully!');
+                loadAddressBooks();
+            }).fail(function() {
+                showMessage('Error creating address book', true);
+            });
+        });
+
+        // Show add buddy form
+        $('#add-buddy-btn').click(function() {
+            $('#add-buddy-form').removeClass('hidden');
+            $('#buddy-name').focus();
+        });
+
+        // Cancel add buddy
+        $('#cancel-buddy-btn').click(function() {
+            $('#add-buddy-form').addClass('hidden');
+            clearBuddyForm();
+        });
+
+        // Submit new buddy
+        $('#submit-buddy-btn').click(function() {
+            const buddy = {
+                name: $('#buddy-name').val(),
+                phoneNumber: $('#buddy-phone').val(),
+                emailAddress: $('#buddy-email').val()
+            };
+
+            if (!buddy.name || !buddy.phoneNumber || !buddy.emailAddress) {
+                showMessage('Please fill in all fields', true);
+                return;
+            }
+
+            $.ajax({
+                url: '/addressbook/' + currentAddressBookId + '/buddies',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(buddy)
+            }).done(function(data) {
+                showMessage('Buddy added successfully!');
+                loadBuddies(currentAddressBookId);
+                $('#add-buddy-form').addClass('hidden');
+                clearBuddyForm();
+            }).fail(function() {
+                showMessage('Error adding buddy', true);
+            });
+        });
+    });
+
+    function loadAddressBooks() {
+        $.ajax({
+            url: '/addressbook',
+            method: 'GET'
+        }).done(function(books) {
+            const list = $('#addressbook-list');
+            list.empty();
+
+            if (books.length === 0) {
+                list.append('<li>No address books yet. Create one!</li>');
+                return;
+            }
+
+            books.forEach(function(book) {
+                const item = $('<li class="book-item"></li>');
+                item.html(
+                    '<strong>Address Book #' + book.id + '</strong><br>' +
+                    'Buddies: ' + book.buddies.length + '<br>' +
+                    '<button onclick="viewAddressBook(' + book.id + ')">View</button>'
+                );
+                list.append(item);
+            });
+        });
+    }
+
+    function viewAddressBook(id) {
+        currentAddressBookId = id;
+        $('#current-book-id').text(id);
+        $('#no-selection').addClass('hidden');
+        $('#buddy-section').removeClass('hidden');
+        $('#add-buddy-form').addClass('hidden');
+        clearBuddyForm();
+        loadBuddies(id);
+    }
+
+    function loadBuddies(addressBookId) {
+        $.ajax({
+            url: '/addressbook/' + addressBookId + '/buddies',
+            method: 'GET'
+        }).done(function(book) {
+            const list = $('#buddy-list');
+            list.empty();
+
+            if (!book.buddies || book.buddies.length === 0) {
+                list.append('<li>No buddies in this address book yet.</li>');
+                return;
+            }
+
+            book.buddies.forEach(function(buddy) {
+                const item = $('<li class="buddy-item"></li>');
+                item.html(
+                    '<strong>' + buddy.name + '</strong><br>' +
+                    'Phone: ' + buddy.phoneNumber + '<br>' +
+                    'Email: ' + buddy.emailAddress + '<br>' +
+                    '<button class="delete-btn" onclick="removeBuddy(' +
+                    addressBookId + ', ' + buddy.id + ')">Remove</button>'
+                );
+                list.append(item);
+            });
+        });
+    }
+
+    function removeBuddy(addressBookId, buddyId) {
+        if (!confirm('Are you sure you want to remove this buddy?')) {
+            return;
+        }
+
+        $.ajax({
+            url: '/addressbook/' + addressBookId + '/buddies/' + buddyId,
+            method: 'DELETE'
+        }).done(function() {
+            showMessage('Buddy removed successfully!');
+            loadBuddies(addressBookId);
+            loadAddressBooks(); // Refresh count
+        }).fail(function() {
+            showMessage('Error removing buddy', true);
+        });
+    }
+
+    function clearBuddyForm() {
+        $('#buddy-name').val('');
+        $('#buddy-phone').val('');
+        $('#buddy-email').val('');
+    }
+
+    function showMessage(msg, isError) {
+        const msgArea = $('#message-area');
+        msgArea.html('<div class="message ' + (isError ? 'error' : '') + '">' + msg + '</div>');
+        setTimeout(function() {
+            msgArea.empty();
+        }, 3000);
+    }
+</script>
+</body>
+</html>
